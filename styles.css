@@ -1,0 +1,127 @@
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07060e;
+  --panel:rgba(12,10,24,.93);
+  --accent:#ff2fb3;
+  --accent2:#00e5ff;
+  --gold:#ffd23f;
+  --txt:#f4f1ff;
+  --danger:#ff3366;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif;color:var(--txt)}
+#app{position:fixed;inset:0}
+#game-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+#game-canvas:active{cursor:grabbing}
+.hidden{display:none!important}
+
+#scoreboard{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:stretch;background:var(--panel);border:1px solid rgba(255,47,179,.4);border-radius:10px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 24px rgba(255,47,179,.25);z-index:5;min-width:340px}
+.sb-team{display:flex;align-items:center;gap:10px;padding:8px 14px;font-weight:800;font-size:20px}
+.sb-team.home{background:linear-gradient(90deg,#5b0fa6,#00e5ff)}
+.sb-team.away{background:linear-gradient(90deg,#ff2f2f,#5b0f2b);flex-direction:row}
+.sb-team span:last-child{font-size:24px}
+.sb-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 16px;background:#0b0916}
+#sb-target{font-size:15px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+#sb-quarter{font-size:12px;opacity:.8;letter-spacing:2px}
+
+#ticker{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:20px;font-size:13px;z-index:5;max-width:90vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+#hype{position:absolute;left:22px;top:90px;z-index:5;width:44px;text-align:center}
+#hype-label{font-size:12px;font-weight:800;margin-bottom:4px;text-shadow:0 2px 6px #000}
+#hype-bar{width:22px;height:200px;margin:0 auto;background:rgba(0,0,0,.6);border:2px solid #fff;border-radius:11px;overflow:hidden;display:flex;align-items:flex-end}
+#hype-fill{width:100%;height:0%;background:linear-gradient(to top,#ff2f2f,#ff9a00,#ffd23f,#fff);transition:height .25s}
+.hype-team{font-size:9px;margin-top:2px;opacity:.8;white-space:nowrap}
+.hype-team.home{color:#00e5ff}
+.hype-team.away{color:#ff2fb3}
+
+#legend-banner{position:absolute;top:110px;left:50%;transform:translateX(-50%);font-size:34px;font-weight:900;letter-spacing:3px;color:var(--gold);text-shadow:0 0 24px var(--accent),0 3px 0 #000;z-index:6;animation:pulse .5s infinite alternate ease-in-out;pointer-events:none}
+@keyframes pulse{from{transform:translateX(-50%) scale(1)}to{transform:translateX(-50%) scale(1.07)}}
+
+#shotmeter{position:absolute;right:22px;bottom:110px;z-index:5;text-align:center}
+#shotmeter-bar{position:relative;width:26px;height:180px;background:rgba(0,0,0,.6);border:2px solid #fff;border-radius:13px;overflow:hidden;margin:0 auto}
+#shotmeter-fill{position:absolute;bottom:0;left:0;right:0;height:0%;background:linear-gradient(to top,#22c55e,#eab308,#ef4444)}
+#shotmeter-green{position:absolute;left:0;right:0;background:rgba(34,197,94,.85);border-top:1px solid #fff;border-bottom:1px solid #fff}
+#shotmeter-label{margin-top:6px;font-weight:800;letter-spacing:2px;font-size:12px;text-shadow:0 2px 6px #000}
+
+#stamina{position:absolute;left:22px;bottom:40px;z-index:5;width:200px}
+#stamina-fill{height:12px;background:linear-gradient(90deg,#00e5ff,#ff2fb3);border-radius:6px;border:1px solid rgba(255,255,255,.5);transition:width .12s}
+#stamina span{font-size:11px;letter-spacing:2px;opacity:.85}
+
+#game-msg{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);font-size:58px;font-weight:900;letter-spacing:2px;text-shadow:0 4px 0 #000,0 0 40px var(--accent);z-index:6;pointer-events:none;text-align:center;white-space:nowrap;animation:popIn .3s ease-out}
+@keyframes popIn{from{opacity:0;transform:translate(-50%,-50%) scale(0.8)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes popOut{from{opacity:1;transform:translate(-50%,-50%) scale(1)}to{opacity:0;transform:translate(-50%,-50%) scale(0.8)}}
+
+#controls-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:12px;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:8px;z-index:5;white-space:nowrap;max-width:96vw;overflow:hidden;text-overflow:ellipsis}
+
+#combo-display{position:absolute;right:22px;top:90px;z-index:5;text-align:right;min-width:120px}
+.combo-counter{font-size:48px;font-weight:900;color:var(--gold);text-shadow:0 0 20px var(--accent),0 2px 0 #000;line-height:1}
+.combo-counter.combo-fire{animation:firePulse .3s infinite alternate;color:#ff6a00;text-shadow:0 0 30px #ff6a00}
+.combo-counter.combo-lightning{animation:lightningPulse .15s infinite alternate;color:#fff;text-shadow:0 0 40px #00e5ff}
+@keyframes firePulse{from{transform:scale(1)}to{transform:scale(1.15)}}
+@keyframes lightningPulse{from{transform:scale(1)}to{transform:scale(1.2)}}
+.combo-multiplier{font-size:18px;font-weight:800;color:var(--accent2);margin-top:-8px}
+.combo-tricks{margin-top:6px;display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+.trick-tag{font-size:11px;background:rgba(255,47,179,.3);border:1px solid rgba(255,47,179,.6);padding:2px 6px;border-radius:4px;color:var(--gold);white-space:nowrap}
+
+#player-indicator{position:absolute;left:22px;top:310px;z-index:5;background:rgba(0,0,0,.5);border:1px solid rgba(255,47,179,.3);border-radius:8px;padding:8px 12px;min-width:160px}
+#indicator-name{font-weight:800;font-size:14px;color:var(--gold)}
+#indicator-stats{font-size:11px;opacity:.8;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+#menu,#pause,#game-over-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(10,6,26,.6),rgba(2,2,10,.9));z-index:10;padding:16px}
+.menu-card{background:linear-gradient(180deg,rgba(22,12,40,.97),rgba(8,6,20,.97));border:1px solid rgba(255,47,179,.35);border-radius:18px;padding:26px 30px;max-width:640px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,47,179,.12);max-height:94vh;overflow:auto}
+.menu-card.wide{max-width:760px}
+.menu-card.small{max-width:380px;text-align:center}
+.logo-row{display:flex;align-items:center;gap:12px}
+.logo-row .ball{font-size:44px;animation:bounce 1.2s infinite alternate ease-in-out}
+@keyframes bounce{from{transform:translateY(0) rotate(-12deg)}to{transform:translateY(-10px) rotate(12deg)}}
+h1{font-size:44px;letter-spacing:2px}h1 span{color:var(--accent);text-shadow:0 0 22px rgba(255,47,179,.7)}
+.tagline{opacity:.75;margin:6px 0 14px;font-size:14px}
+.mode-row{display:flex;gap:10px;margin-bottom:14px}
+.mode-btn{flex:1;background:#1a1430;border:2px solid rgba(255,255,255,.2);font-size:16px;padding:11px}
+.mode-btn.selected{background:linear-gradient(180deg,#ff2fb3,#a3126e);border-color:#fff}
+.sec-label{font-size:11px;letter-spacing:2px;opacity:.7;display:block;margin-bottom:8px}
+.roster-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 14px}
+.legend-card{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:10px;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.legend-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,47,179,.2)}
+.legend-card.selected{border-color:var(--gold);background:rgba(255,210,63,.1);box-shadow:0 0 18px rgba(255,210,63,.3)}
+.legend-card h3{font-size:15px}
+.legend-card .aka{font-size:11px;opacity:.65;margin-bottom:6px}
+.legend-card .bars{font-size:10px;line-height:1.75}
+.legend-card .bar{height:5px;background:#222;border-radius:3px;margin-top:1px}
+.legend-card .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px}
+.legend-card .special{font-size:10px;color:var(--gold);margin-top:5px;font-weight:700}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.menu-grid label{font-size:11px;letter-spacing:2px;opacity:.7}
+.menu-grid select{width:100%;margin-top:4px;padding:10px;border-radius:8px;background:#140f28;color:#fff;border:1px solid rgba(255,255,255,.2);font-size:14px}
+.btn-row{display:flex;gap:10px}
+button{background:linear-gradient(180deg,#ff2fb3,#b3127a);border:none;color:#fff;font-weight:800;font-size:17px;padding:12px 22px;border-radius:10px;cursor:pointer;letter-spacing:1px}
+button:hover{filter:brightness(1.12)}button.ghost{background:#1a1430;border:1px solid rgba(255,255,255,.25)}
+#howto{margin-top:14px;font-size:13px;line-height:1.6;background:rgba(255,255,255,.05);padding:12px;border-radius:10px}
+.foot{margin-top:12px;font-size:11px;opacity:.5}
+.cam-row{margin-top:12px;font-size:13px}
+
+#game-over-overlay .game-over-modal{background:linear-gradient(180deg,rgba(22,12,40,.97),rgba(8,6,20,.97));border:1px solid rgba(255,47,179,.35);border-radius:18px;padding:32px;max-width:500px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,47,179,.12)}
+#game-over-overlay h1{font-size:40px;margin-bottom:16px;color:var(--gold)}
+.final-score{font-size:36px;font-weight:900;margin:16px 0;color:var(--accent2)}
+.mvp{font-size:18px;color:var(--gold);margin-bottom:24px;padding:16px;background:rgba(255,210,63,.1);border:1px solid rgba(255,210,63,.3);border-radius:8px}
+.stats{display:flex;gap:24px;justify-content:center;margin-bottom:24px}
+.team-stats{background:rgba(0,0,0,.3);padding:16px;border-radius:8px;min-width:120px}
+.team-stats h3{color:var(--accent2);margin-bottom:8px}
+.team-stats div{font-size:13px;margin:4px 0}
+.game-over-buttons{display:flex;gap:12px;justify-content:center}
+
+#loading{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:#07060e;z-index:20;font-weight:800;letter-spacing:3px}
+#loading .spin{font-size:60px;animation:bounce .6s infinite alternate ease-in-out}
+
+#errbox{position:absolute;bottom:12px;right:12px;background:#7a0f18;padding:10px 14px;border-radius:8px;z-index:50;font-size:13px;max-width:40vw}
+
+@media(max-width:640px){
+  h1{font-size:30px}
+  .menu-grid{grid-template-columns:1fr}
+  #scoreboard{min-width:0}
+  #game-msg{font-size:34px}
+  .roster-grid{grid-template-columns:repeat(2,1fr)}
+  #hype{display:none}
+  #combo-display{right:10px;top:80px}
+  .combo-counter{font-size:36px}
+  #player-indicator{left:10px;top:280px}
+}

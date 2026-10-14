@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STREET LEGENDS — 3D Street Basketball</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+</head>
+<body>
+<div id="app">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="scoreboard" class="hidden">
+    <div class="sb-team home"><span id="sb-home-abbr">UPT</span><span id="sb-home-score">0</span></div>
+    <div class="sb-mid">
+      <div id="sb-target">FIRST TO 21</div>
+      <div id="sb-quarter">3v3</div>
+    </div>
+    <div class="sb-team away"><span id="sb-away-score">0</span><span id="sb-away-abbr">DNT</span></div>
+  </div>
+  <div id="ticker" class="hidden"><span id="ticker-text">Welcome to the Cage</span></div>
+
+  <div id="hype" class="hidden">
+    <div id="hype-label">🔥 HYPE</div>
+    <div id="hype-bar"><div id="hype-fill"></div></div>
+    <div id="hype-home" class="hype-team home">UPT: 0%</div>
+    <div id="hype-away" class="hype-team away">DNT: 0%</div>
+  </div>
+  <div id="legend-banner" class="hidden">👑 LEGEND MODE 👑</div>
+
+  <div id="shotmeter" class="hidden">
+    <div id="shotmeter-bar"><div id="shotmeter-fill"></div><div id="shotmeter-green"></div></div>
+    <div id="shotmeter-label">RELEASE</div>
+  </div>
+  <div id="stamina" class="hidden"><div id="stamina-fill"></div><span>STAMINA</span></div>
+  <div id="game-msg" class="hidden"></div>
+  <div id="controls-hint" class="hidden">
+    <b>WASD</b> Move &nbsp; <b>SHIFT</b> Sprint &nbsp; <b>SPACE</b> Shoot/Jump &nbsp; 
+    <b>J</b> Crossover &nbsp; <b>Q</b> Pass &nbsp; <b>T</b> Alley-Oop &nbsp; 
+    <b>E</b> Steal/Block &nbsp; <b>TAB</b> Switch &nbsp; <b>M</b> Mute
+  </div>
+
+  <div id="combo-display" class="hidden">
+    <div id="combo-counter" class="combo-counter">0</div>
+    <div id="combo-multiplier" class="combo-multiplier">x1.0</div>
+    <div id="combo-tricks" class="combo-tricks"></div>
+  </div>
+
+  <div id="player-indicator" class="hidden">
+    <div id="indicator-name"></div>
+    <div id="indicator-stats"></div>
+  </div>
+
+  <div id="loading"><div class="spin">🏀</div><p>LOADING THE CAGE…</p></div>
+  <div id="errbox" class="hidden"></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/three.module.js",
+    "three/examples/jsm/loaders/GLTFLoader.js": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js",
+    "three/examples/jsm/loaders/DRACOLoader.js": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/DRACOLoader.js"
+  }
+}
+</script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
