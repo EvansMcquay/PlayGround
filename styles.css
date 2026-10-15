@@ -101,6 +101,8 @@ button:hover{filter:brightness(1.12)}button.ghost{background:#1a1430;border:1px 
 
 #game-over-overlay .game-over-modal{background:linear-gradient(180deg,rgba(22,12,40,.97),rgba(8,6,20,.97));border:1px solid rgba(255,47,179,.35);border-radius:18px;padding:32px;max-width:500px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,47,179,.12)}
 #game-over-overlay h1{font-size:40px;margin-bottom:16px;color:var(--gold)}
+#game-over-overlay .aka{font-size:12px;letter-spacing:2px;opacity:.7;margin-bottom:8px}
+#roster-streamers-label,#roster-rappers-label,#roster-og-label{margin-top:10px}
 .final-score{font-size:36px;font-weight:900;margin:16px 0;color:var(--accent2)}
 .mvp{font-size:18px;color:var(--gold);margin-bottom:24px;padding:16px;background:rgba(255,210,63,.1);border:1px solid rgba(255,210,63,.3);border-radius:8px}
 .stats{display:flex;gap:24px;justify-content:center;margin-bottom:24px}

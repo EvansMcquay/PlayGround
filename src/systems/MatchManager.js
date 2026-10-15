@@ -14,10 +14,11 @@ export const MatchPhase = {
 };
 
 export const MatchRules = {
-  STREET_1V1: { target: 11, winBy2: false, timeLimit: 0, makeItTakeIt: true },
-  STREET_3V3: { target: 21, winBy2: true, timeLimit: 0, makeItTakeIt: false },
-  TIMED_1V1: { target: 0, winBy2: false, timeLimit: 300, makeItTakeIt: true },
-  TIMED_3V3: { target: 0, winBy2: false, timeLimit: 600, makeItTakeIt: false },
+  STREET_1V1: { target: 11, winBy2: false, timeLimit: 0, makeItTakeIt: true, teamSize: 1 },
+  STREET_2V2: { target: 15, winBy2: false, timeLimit: 0, makeItTakeIt: false, teamSize: 2 },
+  STREET_3V3: { target: 21, winBy2: true, timeLimit: 0, makeItTakeIt: false, teamSize: 3 },
+  TIMED_1V1: { target: 0, winBy2: false, timeLimit: 300, makeItTakeIt: true, teamSize: 1 },
+  TIMED_3V3: { target: 0, winBy2: false, timeLimit: 600, makeItTakeIt: false, teamSize: 3 },
 };
 
 export class MatchManager {
@@ -63,12 +64,13 @@ export class MatchManager {
     this.eventCallbacks = new Map();
   }
 
-  async initialize(rules = MatchRules.STREET_3V3, userCharId = 'kai_cenat', difficulty = 1.0) {
+  async initialize(rules = MatchRules.STREET_3V3, userCharId = 'kai_cenat', difficulty = 1.0, venueId = 'cage_nyc') {
     this.rules = rules;
     this.difficulty = difficulty;
-    
+    this.venueId = venueId;
+
     this.court = new StreetCourt();
-    await this.court.build(this.engine);
+    await this.court.build(this.engine, venueId);
     
     this.ball = new Basketball();
     this.ball.mesh = this.ball.createMesh(this.ball.createProceduralMaterial());
@@ -86,7 +88,7 @@ export class MatchManager {
 
   async createTeams(userCharId) {
     const roster = this.engine.characterRoster;
-    const count = this.rules === MatchRules.STREET_1V1 || this.rules === MatchRules.TIMED_1V1 ? 1 : 3;
+    const count = this.rules.teamSize || (this.rules.target <= 11 ? 1 : 3);
     
     const userChar = await roster.loadCharacter(userCharId);
     if (!userChar) throw new Error(`Character ${userCharId} not found`);
@@ -97,20 +99,24 @@ export class MatchManager {
     this.homeTeam.push(this.userCharacter);
     this.engine.scene.add(this.userCharacter.root);
     
-    const homePool = roster.getStreamerLegends().filter(c => c.id !== userCharId);
+    const allIds = roster.getAllPlayableData().map(d => d.id).filter(id => id !== userCharId);
+    const pickUnique = (used) => {
+      const avail = allIds.filter(id => !used.has(id));
+      const id = avail[Math.floor(Math.random() * avail.length)];
+      used.add(id);
+      return id;
+    };
+    const used = new Set([userCharId]);
     for (let i = 1; i < count; i++) {
-      const char = homePool[Math.floor(Math.random() * homePool.length)];
-      const instance = await roster.createPlayerInstance(char.id, 'home');
+      const instance = await roster.createPlayerInstance(pickUnique(used), 'home');
       instance.isHome = true;
       instance.engine = this.engine;
       this.homeTeam.push(instance);
       this.engine.scene.add(instance.root);
     }
-    
-    const awayPool = [...roster.getStreamerLegends(), ...roster.getOriginalLegends()];
+
     for (let i = 0; i < count; i++) {
-      const char = awayPool[Math.floor(Math.random() * awayPool.length)];
-      const instance = await roster.createPlayerInstance(char.id, 'away');
+      const instance = await roster.createPlayerInstance(pickUnique(used), 'away');
       instance.isHome = false;
       instance.engine = this.engine;
       this.awayTeam.push(instance);
@@ -288,10 +294,10 @@ export class MatchManager {
       u.shotCharge = Math.min(1, u.shotCharge + dt * 1.2);
     }
     
-    if (input.isPressed('KeyJ') && u.state.hasBall && u.crossoverCooldown <= 0) {
-      u.doCrossover?.();
-      u.crossoverCooldown = 1.0;
-    }
+    if (input.wasPressed?.('KeyJ') && u.state.hasBall) u.doTrickMove?.('crossover');
+    if (input.wasPressed?.('KeyK') && u.state.hasBall) u.doTrickMove?.('behind_back');
+    if (input.wasPressed?.('KeyL') && u.state.hasBall) u.doTrickMove?.('spin');
+    if (input.wasPressed?.('KeyH') && u.state.hasBall) u.doTrickMove?.('hesitation');
     
     if (input.isPressed('KeyQ') && u.state.hasBall) {
       const target = this.findOpenTeammate(u);

@@ -60,6 +60,8 @@ class StreetLegendsGame {
     this.characterRoster = new CharacterRoster(this.engine);
     this.engine.characterRoster = this.characterRoster;
     await this.characterRoster.initialize();
+    // menu is created before the roster loads — repopulate cards now
+    this.uiManager.populateRoster?.();
     
     this.hypeSystem = new ComboHypeSystem(this.engine);
     this.engine.hypeSystem = this.hypeSystem;
@@ -102,9 +104,9 @@ class StreetLegendsGame {
     this.cameraController?.onResize?.();
   }
 
-  async startMatch(characterId = 'kai_cenat', mode = '3v3', difficulty = 1.0) {
+  async startMatch(characterId = 'kai_cenat', mode = '3v3', difficulty = 1.0, venueId = 'cage_nyc') {
     this.showLoading('Setting up the cage...');
-    
+
     this.uiManager.hide('menu');
     this.uiManager.show('scoreboard');
     this.uiManager.show('ticker');
@@ -113,10 +115,12 @@ class StreetLegendsGame {
     this.uiManager.show('controls-hint');
     this.uiManager.show('combo-display');
     this.uiManager.show('player-indicator');
-    
-    const rules = mode === '1v1' ? { ...MatchRules.STREET_1V1 } : { ...MatchRules.STREET_3V3 };
-    
-    await this.matchManager.initialize(rules, characterId, difficulty);
+
+    const base = mode === '1v1' ? MatchRules.STREET_1V1 : mode === '2v2' ? MatchRules.STREET_2V2 : MatchRules.STREET_3V3;
+    const rules = { ...base };
+
+    await this.matchManager.initialize(rules, characterId, difficulty, venueId);
+    this.matchManager.mode = mode;
     
     this.userCharacter = this.matchManager.userCharacter;
     this.setupDunkSystem();
@@ -156,12 +160,14 @@ class StreetLegendsGame {
     const dt = Math.min(0.033, (now - this.lastTime) / 1000);
     this.lastTime = now;
     
-    this.inputManager.update();
-    
+    // Consume input BEFORE snapshotting previous-keys so wasPressed /
+    // wasReleased edge detection sees keys that arrived between frames.
     if (this.phase === 'play' && !this.paused) {
       this.update(dt);
     }
-    
+
+    this.inputManager.update();
+
     this.render();
     
     requestAnimationFrame(this.gameLoop);
@@ -188,8 +194,15 @@ class StreetLegendsGame {
   updateUI() {
     const state = this.matchManager.getState();
     const hype = this.hypeSystem.getUIState();
+    const legendOn = !!(hype.legendHome || hype.legendAway);
+    if (legendOn !== this._legendShown) {
+      this._legendShown = legendOn;
+      this.uiManager.showLegendBanner(legendOn);
+    }
     
-    this.uiManager.updateScoreboard(state.score, state.possession, this.matchManager.rules.target, this.matchManager.rules === MatchRules.STREET_1V1 ? '1v1' : '3v3');
+    const ts = this.matchManager.rules.teamSize;
+    const modeLabel = this.matchManager.mode || (ts === 1 ? '1v1' : ts === 2 ? '2v2' : '3v3');
+    this.uiManager.updateScoreboard(state.score, state.possession, this.matchManager.rules.target, modeLabel);
     this.uiManager.updateHypeMeter(
       hype.hypeHome, hype.hypeAway,
       hype.legendHome, hype.legendAway,

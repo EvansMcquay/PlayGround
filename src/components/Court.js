@@ -1,5 +1,62 @@
 import * as THREE from 'three';
 
+export const VENUES = [
+  {
+    id: 'cage_nyc', name: 'The Cage • NYC Night',
+    desc: 'Chain-link, floodlights, neon. The classic.',
+    base: '#1a1d24', keyA: 'rgba(100, 20, 160, 0.85)', keyB: 'rgba(0, 120, 140, 0.85)',
+    sky: 0x030305, fog: [40, 150], flood: 0xffd4a0,
+    signs: ['STREET', 'LEGENDS', 'THE CAGE', 'NO BLOOD', 'NO FOUL'],
+    signColors: [0xff2fb3, 0x00e5ff, 0xffd23f, 0xff3366, 0x00ffcc],
+    crowd: [0xff2fb3, 0x00e5ff, 0xffd23f, 0xe8e8e8, 0xff6a00, 0x7b2fff, 0x22c55e, 0xff3366, 0x00ffcc, 0xffcc00],
+  },
+  {
+    id: 'rooftop_ny', name: 'Rooftop • NYC Sunset',
+    desc: 'Golden-hour skyline ball above the city.',
+    base: '#232028', keyA: 'rgba(200, 90, 20, 0.85)', keyB: 'rgba(90, 40, 140, 0.85)',
+    sky: 0x2a1420, fog: [45, 160], flood: 0xffb060,
+    signs: ['ROOFTOP', 'SUNSET BALL', 'SKYLINE', 'NO BLOOD', 'NO FOUL'],
+    signColors: [0xff9a00, 0xff2fb3, 0xffd23f, 0xff3366, 0x00e5ff],
+    crowd: [0xff9a00, 0xffd23f, 0xe8e8e8, 0xff6a5b, 0xc0c0c0, 0x7b2fff, 0x22c55e, 0xff3366, 0xffcc00, 0xffffff],
+  },
+  {
+    id: 'atl_night', name: 'Atlanta • Night Drive',
+    desc: 'Humid ATL night, green-and-gold glow.',
+    base: '#161d18', keyA: 'rgba(10, 120, 60, 0.85)', keyB: 'rgba(160, 120, 20, 0.85)',
+    sky: 0x020604, fog: [40, 150], flood: 0xd4ffb0,
+    signs: ['ATLANTA', 'NIGHT DRIVE', 'THE A', 'NO BLOOD', 'NO FOUL'],
+    signColors: [0x22c55e, 0xffd23f, 0x00ffcc, 0xff3366, 0x00e5ff],
+    crowd: [0x22c55e, 0xffd23f, 0xe8e8e8, 0x00ffcc, 0x9a5bff, 0xff6a00, 0xffffff, 0xff3366, 0x00e5ff, 0x7b2fff],
+  },
+  {
+    id: 'chi_hood', name: 'Chicago • Neighborhood',
+    desc: 'Windy-city park court, red-and-black grit.',
+    base: '#201a1c', keyA: 'rgba(170, 20, 30, 0.85)', keyB: 'rgba(20, 20, 26, 0.9)',
+    sky: 0x060408, fog: [38, 140], flood: 0xffc0b0,
+    signs: ['CHI-TOWN', 'WINDY BALL', 'NO BLOOD', 'NO FOUL', 'LEGENDS'],
+    signColors: [0xff2f2f, 0xe8e8e8, 0xff3366, 0x00ffcc, 0xffd23f],
+    crowd: [0xff2f2f, 0xe8e8e8, 0x222226, 0xff6a00, 0xffd23f, 0x7b2fff, 0x00e5ff, 0xff3366, 0xffffff, 0x22c55e],
+  },
+  {
+    id: 'mia_neon', name: 'Miami • Neon Beach',
+    desc: 'Pastel neon and palm-night vibes.',
+    base: '#181c26', keyA: 'rgba(255, 47, 179, 0.8)', keyB: 'rgba(0, 229, 255, 0.8)',
+    sky: 0x0a0518, fog: [42, 155], flood: 0xffc0f0,
+    signs: ['MIAMI', 'NEON BEACH', 'VICE BALL', 'NO BLOOD', 'NO FOUL'],
+    signColors: [0x00e5ff, 0xff2fb3, 0xff9ad5, 0x7bffff, 0xffd23f],
+    crowd: [0x00e5ff, 0xff2fb3, 0xff9ad5, 0xffffff, 0x7bffff, 0xffd23f, 0xff6a00, 0x22c55e, 0xff3366, 0xe8e8e8],
+  },
+  {
+    id: 'mansion', name: 'Streamer Mansion • Indoor',
+    desc: 'Private indoor court, LED strips, low crowd.',
+    base: '#14161f', keyA: 'rgba(60, 60, 90, 0.9)', keyB: 'rgba(120, 40, 120, 0.85)',
+    sky: 0x050508, fog: [30, 110], flood: 0xc0d4ff,
+    signs: ['MANSION', 'STREAM HOUSE', 'VIP ONLY', 'NO BLOOD', 'NO FOUL'],
+    signColors: [0x9a5bff, 0x00e5ff, 0xffd23f, 0xff3366, 0x22c55e],
+    crowd: [0x9a5bff, 0x00e5ff, 0xffffff, 0xffd23f, 0x222226, 0xff2fb3, 0x00ffcc, 0xe8e8e8, 0x7b2fff, 0xff6a00],
+  },
+];
+
 export class StreetCourt {
   constructor(length = 28, width = 15) {
     this.length = length;
@@ -10,10 +67,14 @@ export class StreetCourt {
     this.fences = [];
     this.crowd = null;
     this.neonSigns = [];
+    this.venueId = 'cage_nyc';
+    this.theme = VENUES[0];
   }
 
-  async build(engine) {
+  async build(engine, venueId = 'cage_nyc') {
     this.engine = engine;
+    this.venueId = venueId;
+    this.theme = VENUES.find(v => v.id === venueId) || VENUES[0];
     await this.createCourtSurface();
     this.createHoops();
     this.createFences();
@@ -21,7 +82,7 @@ export class StreetCourt {
     this.createLighting();
     this.createNeonSigns();
     this.createAtmosphere();
-    
+
     const courtGroup = new THREE.Group();
     courtGroup.name = 'street_court';
     courtGroup.add(this.mesh);
@@ -30,11 +91,25 @@ export class StreetCourt {
     this.fences.forEach(f => courtGroup.add(f));
     if (this.crowd) courtGroup.add(this.crowd);
     this.neonSigns.forEach(n => courtGroup.add(n));
-    
+
     engine.scene.add(courtGroup);
     this.group = courtGroup;
-    
+    this.applyVenue(engine);
+
     return this;
+  }
+
+  applyVenue(engine) {
+    const t = this.theme;
+    if (engine?.scene) {
+      engine.scene.background = new THREE.Color(t.sky);
+      engine.scene.fog = new THREE.Fog(t.sky, t.fog[0], t.fog[1]);
+    }
+    // tint arena floods + neon accents to the venue
+    const flood = new THREE.Color(t.flood);
+    (engine.floodLights || []).forEach(l => l.color.copy(flood));
+    if (engine.neonPink) engine.neonPink.color.setHex(t.signColors[0]);
+    if (engine.neonCyan) engine.neonCyan.color.setHex(t.signColors[1]);
   }
 
   async createCourtSurface() {
@@ -73,7 +148,7 @@ export class StreetCourt {
     const mx = (x) => (x / (this.length + 4) + 0.5) * canvas.width;
     const mz = (z) => (z / (this.width + 4) + 0.5) * canvas.height;
     
-    ctx.fillStyle = '#1a1d24';
+    ctx.fillStyle = this.theme?.base || '#1a1d24';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     for (let i = 0; i < 15000; i++) {
@@ -99,8 +174,8 @@ export class StreetCourt {
       ctx.stroke();
     }
     
-    const keyColorA = 'rgba(100, 20, 160, 0.85)';
-    const keyColorB = 'rgba(0, 120, 140, 0.85)';
+    const keyColorA = this.theme?.keyA || 'rgba(100, 20, 160, 0.85)';
+    const keyColorB = this.theme?.keyB || 'rgba(0, 120, 140, 0.85)';
     const pw = (5.8 / (this.length + 4)) * canvas.width;
     const ph = (4.9 / (this.width + 4)) * canvas.height;
     
@@ -396,8 +471,8 @@ export class StreetCourt {
     this.crowd.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     
     const dummy = new THREE.Object3D();
-    const colors = [
-      0xff2fb3, 0x00e5ff, 0xffd23f, 0xe8e8e8, 0xff6a00, 
+    const colors = this.theme?.crowd || [
+      0xff2fb3, 0x00e5ff, 0xffd23f, 0xe8e8e8, 0xff6a00,
       0x7b2fff, 0x22c55e, 0xff3366, 0x00ffcc, 0xffcc00
     ];
     const colorAttr = new THREE.InstancedBufferAttribute(new Float32Array(N * 3), 3);
@@ -495,13 +570,10 @@ export class StreetCourt {
   }
 
   createNeonSigns() {
-    const signs = [
-      { text: 'STREET', pos: [-20, 8, -16], color: 0xff2fb3, rot: 0.3 },
-      { text: 'LEGENDS', pos: [18, 7, 16], color: 0x00e5ff, rot: -0.2 },
-      { text: 'THE CAGE', pos: [0, 10, -18], color: 0xffd23f, rot: 0 },
-      { text: 'NO BLOOD', pos: [-18, 6, 18], color: 0xff3366, rot: 0.15 },
-      { text: 'NO FOUL', pos: [18, 6, -18], color: 0x00ffcc, rot: -0.15 },
-    ];
+    const texts = this.theme?.signs || ['STREET', 'LEGENDS', 'THE CAGE', 'NO BLOOD', 'NO FOUL'];
+    const cols = this.theme?.signColors || [0xff2fb3, 0x00e5ff, 0xffd23f, 0xff3366, 0x00ffcc];
+    const poses = [[-20, 8, -16, 0.3], [18, 7, 16, -0.2], [0, 10, -18, 0], [-18, 6, 18, 0.15], [18, 6, -18, -0.15]];
+    const signs = texts.map((text, i) => ({ text, pos: poses[i % poses.length].slice(0, 3), color: cols[i % cols.length], rot: poses[i % poses.length][3] }));
     
     signs.forEach(s => {
       const canvas = document.createElement('canvas');

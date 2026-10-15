@@ -128,7 +128,7 @@ export class OpponentAI {
       this.state = 'shoot';
     } else if (shouldDrive) {
       this.state = 'drive';
-      this.targetPosition.copy(this.getDriveTarget());
+      this.targetPosition.copy(this.getDriveTargetPosition());
     } else if (shouldPass) {
       this.state = 'pass';
       this.passTarget = this.findBestPassTarget();
@@ -384,7 +384,16 @@ export class OpponentAI {
 
   performCrossover() {
     this.crossoverCooldown = 2.0;
-    if (this.character.doCrossover) {
+    if (this.character.doTrickMove) {
+      // AI move variety scales with handles: baggy handlers chain spin/behind-back
+      const h = this.character.attributes?.handles || 70;
+      const roll = Math.random() * 100;
+      const move = h > 90 && roll > 70 ? 'spin'
+        : h > 82 && roll > 45 ? 'behind_back'
+        : h > 74 && roll > 82 ? 'hesitation'
+        : 'crossover';
+      this.character.doTrickMove(move);
+    } else if (this.character.doCrossover) {
       this.character.doCrossover();
     }
   }
@@ -498,6 +507,19 @@ export class OpponentAI {
     const rimSide = this.getTargetRimSide();
     const rimPos = this.match.court.getRimPosition(rimSide);
     return rimPos.clone().setY(0);
+  }
+
+  getDriveTargetPosition() {
+    // attack the rim on the ball-handler's strong side, avoiding the nearest defender
+    const rimSide = this.getTargetRimSide();
+    const rimPos = this.match.court.getRimPosition(rimSide);
+    const defender = this.findNearestDefender();
+    const target = rimPos.clone().setY(0);
+    if (defender) {
+      const away = new THREE.Vector3().subVectors(this.character.position, defender.position).setY(0);
+      if (away.lengthSq() > 0.001) target.add(away.normalize().multiplyScalar(1.5));
+    }
+    return target;
   }
 
   getTargetRimSide() {

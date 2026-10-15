@@ -197,6 +197,14 @@ export class Engine {
   setPhase(phase) {
     if (this.game) this.game.setPhase(phase);
   }
+
+  showMessage(text, duration = 1500) {
+    this.uiManager?.showMessage(text, duration);
+  }
+
+  showTicker(text) {
+    this.uiManager?.updateTicker(text);
+  }
 }
 
 export const engine = null;
